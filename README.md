@@ -1,4 +1,4 @@
-# Doryoku – Study Streak & Leaderboard Platform
+# Shūkan (習慣) – Study Streak & Leaderboard Platform
 
 Doryoku is a minimalist productivity web application designed to help students build discipline through consistent study habits. Users log verified study hours and compete on a public leaderboard based on long-term effort.
 
