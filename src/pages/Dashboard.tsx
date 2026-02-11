@@ -4,6 +4,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
+import StreakGrid from "@/components/StreakGrid";
 import type { Json } from "@/integrations/supabase/types";
 
 interface Profile {
@@ -24,17 +25,26 @@ export default function Dashboard() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [profile, setProfile] = useState<Profile | null>(null);
+  const [studyLogs, setStudyLogs] = useState<{ logged_at: string }[]>([]);
   const [cooldown, setCooldown] = useState(0);
   const [incrementing, setIncrementing] = useState(false);
 
   const fetchProfile = useCallback(async () => {
     if (!user) return;
-    const { data } = await supabase
-      .from("profiles")
-      .select("username, total_hours, last_increment, joined_at")
-      .eq("id", user.id)
-      .maybeSingle();
-    if (data) setProfile(data);
+    const [{ data: profileData }, { data: logsData }] = await Promise.all([
+      supabase
+        .from("profiles")
+        .select("username, total_hours, last_increment, joined_at")
+        .eq("id", user.id)
+        .maybeSingle(),
+      supabase
+        .from("study_logs")
+        .select("logged_at")
+        .eq("user_id", user.id)
+        .order("logged_at", { ascending: false }),
+    ]);
+    if (profileData) setProfile(profileData);
+    setStudyLogs(logsData ?? []);
   }, [user]);
 
   useEffect(() => {
@@ -108,6 +118,13 @@ export default function Dashboard() {
         <div className="bg-card rounded-lg border border-border p-6 text-center">
           <p className="text-4xl font-serif font-bold text-foreground">{daysSinceJoined}</p>
           <p className="text-xs text-muted-foreground font-body mt-1">Days Active</p>
+        </div>
+      </div>
+
+      <div className="mb-12">
+        <h2 className="text-sm font-body text-muted-foreground mb-3 text-center">Study Activity</h2>
+        <div className="bg-card rounded-lg border border-border p-4 overflow-hidden">
+          <StreakGrid logs={studyLogs} />
         </div>
       </div>
 
