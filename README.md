@@ -66,20 +66,3 @@ Study hour increments are validated on the server using time difference checks. 
 Leaderboard rankings are generated using cumulative lifetime hours, ensuring long-term consistency is rewarded.
 
 ---
-
-## Local Development
-
-### Prerequisites
-
-- Node.js (v18 or higher)
-- npm
-- Supabase account
-
-### Installation
-
-Clone the repository and install dependencies:
-
-```bash
-git clone <YOUR_REPOSITORY_URL>
-cd <PROJECT_NAME>
-npm install
