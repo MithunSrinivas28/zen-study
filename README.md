@@ -1,50 +1,85 @@
-# Shūkan (習慣) – Study Streak & Leaderboard Platform
+# Shūkan — Study Streak & Leaderboard Platform
 
-Doryoku is a minimalist productivity web application designed to help students build discipline through consistent study habits. Users log verified study hours and compete on a public leaderboard based on long-term effort.
+Shūkan is a minimalist web application designed to help students and self-learners build strong study habits through consistency and measurable effort. The platform allows users to log verified study hours and track their long-term progress on a public leaderboard.
 
-> “Verified Hours. Real Discipline.”
+Shūkan focuses on discipline over motivation by emphasizing daily commitment rather than short-term bursts of activity.
 
----
-
-## 🚀 Features
-
-- User Authentication (Sign Up / Login / Logout)
-- Secure Study Hour Tracking (1-hour cooldown enforced on backend)
-- Lifetime Study Counter
-- Public All-Time Leaderboard
-- Japanese-Inspired Minimal UI
-- Mobile Responsive Design
-- Secure Database with Access Control
+Subtitle: Verified Hours. Real Discipline.
 
 ---
 
-## 🛠️ Tech Stack
+## Overview
 
-### Frontend
+Shūkan enables users to:
+
+- Create secure accounts
+- Log study hours with time-based validation
+- Maintain a lifetime study record
+- Compare progress on a public leaderboard
+- Build sustainable learning habits
+
+The system enforces strict time rules on the backend to ensure fairness and prevent artificial inflation of study hours.
+
+---
+
+## Features
+
+- User authentication using Supabase
+- Secure login and registration
+- Backend-enforced one-hour cooldown for study logging
+- Lifetime study hour tracking
+- Public all-time leaderboard
+- “Since X days” activity calculation
+- Japanese-inspired minimalist user interface
+- Mobile and desktop responsive design
+- Data protection using Row Level Security
+
+---
+
+## Technology Stack
+
+Frontend:
 - React (Vite)
 - TypeScript
 - Tailwind CSS
 - shadcn/ui
 
-### Backend & Database
-- Supabase (PostgreSQL + Auth)
+Backend and Database:
+- Supabase (PostgreSQL + Authentication)
 - Row Level Security (RLS)
 
-### Hosting
+Hosting and Deployment:
 - Vercel
 
 ---
 
-## 📊 Core Logic
+## System Design
 
-- Users can increment study hours only once every 60 minutes
-- Cooldown is validated on the server
-- Each increment updates:
-  - total_hours
-  - last_increment
-- Leaderboard ranks users by total_hours
-- “Since X days” is calculated from account creation date
+Each user account contains:
+
+- Account creation timestamp
+- Total verified study hours
+- Last verified study session timestamp
+
+Study hour increments are validated on the server using time difference checks. Users are allowed to log one hour only after completing a full 60-minute interval since their previous submission.
+
+Leaderboard rankings are generated using cumulative lifetime hours, ensuring long-term consistency is rewarded.
 
 ---
 
+## Local Development
 
+### Prerequisites
+
+- Node.js (v18 or higher)
+- npm
+- Supabase account
+
+### Installation
+
+Clone the repository and install dependencies:
+
+```bash
+git clone <YOUR_REPOSITORY_URL>
+cd <PROJECT_NAME>
+npm install
