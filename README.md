@@ -4,7 +4,7 @@ Shūkan is a minimalist web application designed to help students and self-learn
 
 Shūkan focuses on discipline over motivation by emphasizing daily commitment rather than short-term bursts of activity.
 
-Subtitle: Verified Hours. Real Discipline.
+shukanstudy.vercel.app
 
 ---
 
