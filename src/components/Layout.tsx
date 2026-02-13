@@ -1,9 +1,27 @@
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
+import { Moon, Sun } from "lucide-react";
+import { useEffect, useState } from "react";
+
+function useDarkMode() {
+  const [dark, setDark] = useState(() => {
+    if (typeof window === "undefined") return false;
+    return localStorage.getItem("theme") === "dark" ||
+      (!localStorage.getItem("theme") && window.matchMedia("(prefers-color-scheme: dark)").matches);
+  });
+
+  useEffect(() => {
+    document.documentElement.classList.toggle("dark", dark);
+    localStorage.setItem("theme", dark ? "dark" : "light");
+  }, [dark]);
+
+  return [dark, () => setDark((d) => !d)] as const;
+}
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const { user, signOut } = useAuth();
   const location = useLocation();
+  const [dark, toggleDark] = useDarkMode();
 
   const isActive = (path: string) => location.pathname === path;
 
@@ -14,7 +32,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           <Link to="/" className="font-serif text-2xl font-bold tracking-tight text-foreground">
             習慣 <span className="text-sm font-body font-normal text-muted-foreground ml-1">Shūkan</span>
           </Link>
-          <div className="flex items-center gap-6 text-sm font-body">
+          <div className="flex items-center gap-5 text-sm font-body">
             <Link
               to="/leaderboard"
               className={`transition-colors hover:text-foreground ${
@@ -50,6 +68,13 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 Login
               </Link>
             )}
+            <button
+              onClick={toggleDark}
+              aria-label="Toggle dark mode"
+              className="p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+            >
+              {dark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+            </button>
           </div>
         </nav>
       </header>
