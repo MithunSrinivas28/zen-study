@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import StreakGrid from "@/components/StreakGrid";
+import FloatingTimer from "@/components/FloatingTimer";
 import type { Json } from "@/integrations/supabase/types";
 
 interface Profile {
@@ -121,31 +122,35 @@ export default function Dashboard() {
         </div>
       </div>
 
+      {/* Prominent +1 Hour Button */}
       <div className="mb-12">
+        {cooldown > 0 ? (
+          <div className="text-center space-y-2">
+            <Button disabled className="w-full max-w-sm mx-auto bg-muted text-muted-foreground font-body text-lg py-7 cursor-not-allowed rounded-xl">
+              Cooldown — {formatCountdown(cooldown)}
+            </Button>
+            <p className="text-xs text-muted-foreground font-body">Rest and return when the timer completes</p>
+          </div>
+        ) : (
+          <Button
+            onClick={handleIncrement}
+            disabled={incrementing}
+            className="w-full max-w-sm mx-auto bg-accent text-accent-foreground hover:bg-accent/90 font-body text-xl py-8 rounded-xl transition-all active:scale-95 shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
+          >
+            <span className="text-2xl">＋</span>
+            {incrementing ? "Logging..." : "1 Hour"}
+          </Button>
+        )}
+      </div>
+
+      <div className="mb-8">
         <h2 className="text-sm font-body text-muted-foreground mb-3 text-center">Study Activity</h2>
         <div className="bg-card rounded-lg border border-border p-4 overflow-hidden">
           <StreakGrid logs={studyLogs} />
         </div>
       </div>
 
-      <div className="text-center">
-        {cooldown > 0 ? (
-          <div className="space-y-3">
-            <Button disabled className="w-full max-w-xs bg-muted text-muted-foreground font-body text-lg py-6 cursor-not-allowed">
-              Wait {formatCountdown(cooldown)}
-            </Button>
-            <p className="text-xs text-muted-foreground font-body">Cooldown active — rest and return</p>
-          </div>
-        ) : (
-          <Button
-            onClick={handleIncrement}
-            disabled={incrementing}
-            className="w-full max-w-xs bg-accent text-accent-foreground hover:bg-accent/90 font-body text-lg py-6 transition-all active:scale-95"
-          >
-            {incrementing ? "Logging..." : "+1 Hour"}
-          </Button>
-        )}
-      </div>
+      <FloatingTimer cooldown={cooldown} />
     </div>
   );
 }
