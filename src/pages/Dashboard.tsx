@@ -6,6 +6,9 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import StreakGrid from "@/components/StreakGrid";
 import FloatingTimer from "@/components/FloatingTimer";
+import PipTimerContent from "@/components/PipTimerContent";
+import { usePictureInPicture } from "@/hooks/usePictureInPicture";
+import { PictureInPicture2 } from "lucide-react";
 import type { Json } from "@/integrations/supabase/types";
 
 interface Profile {
@@ -29,6 +32,7 @@ export default function Dashboard() {
   const [studyLogs, setStudyLogs] = useState<{ logged_at: string }[]>([]);
   const [cooldown, setCooldown] = useState(0);
   const [incrementing, setIncrementing] = useState(false);
+  const { isSupported: pipSupported, isOpen: pipOpen, toggle: togglePip, Portal: PipPortal } = usePictureInPicture();
 
   const fetchProfile = useCallback(async () => {
     if (!user) return;
@@ -124,12 +128,23 @@ export default function Dashboard() {
 
       {/* Prominent +1 Hour Button */}
       <div className="mb-12">
-        {cooldown > 0 ? (
-          <div className="text-center space-y-2">
+      {cooldown > 0 ? (
+          <div className="text-center space-y-3">
             <Button disabled className="w-full max-w-sm mx-auto bg-muted text-muted-foreground font-body text-lg py-7 cursor-not-allowed rounded-xl">
               Cooldown — {formatCountdown(cooldown)}
             </Button>
             <p className="text-xs text-muted-foreground font-body">Rest and return when the timer completes</p>
+            {pipSupported && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={togglePip}
+                className="font-body gap-2"
+              >
+                <PictureInPicture2 size={16} />
+                {pipOpen ? "Close Float" : "Float Timer"}
+              </Button>
+            )}
           </div>
         ) : (
           <Button
@@ -151,6 +166,10 @@ export default function Dashboard() {
       </div>
 
       <FloatingTimer cooldown={cooldown} />
+
+      <PipPortal>
+        <PipTimerContent cooldown={cooldown} />
+      </PipPortal>
     </div>
   );
 }
