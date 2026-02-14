@@ -14,12 +14,37 @@ export type Database = {
   }
   public: {
     Tables: {
+      daily_commitments: {
+        Row: {
+          commitment_date: string
+          created_at: string
+          id: string
+          target_hours: number
+          user_id: string
+        }
+        Insert: {
+          commitment_date?: string
+          created_at?: string
+          id?: string
+          target_hours: number
+          user_id: string
+        }
+        Update: {
+          commitment_date?: string
+          created_at?: string
+          id?: string
+          target_hours?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
           id: string
           joined_at: string
           last_increment: string | null
+          points: number
           total_hours: number
           updated_at: string
           username: string
@@ -29,6 +54,7 @@ export type Database = {
           id: string
           joined_at?: string
           last_increment?: string | null
+          points?: number
           total_hours?: number
           updated_at?: string
           username: string
@@ -38,6 +64,7 @@ export type Database = {
           id?: string
           joined_at?: string
           last_increment?: string | null
+          points?: number
           total_hours?: number
           updated_at?: string
           username?: string
