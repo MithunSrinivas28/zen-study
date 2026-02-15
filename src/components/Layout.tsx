@@ -2,6 +2,7 @@ import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { Moon, Sun } from "lucide-react";
 import { useEffect, useState } from "react";
+import SpotifyMiniPlayer from "@/components/SpotifyMiniPlayer";
 
 function useDarkMode() {
   const [dark, setDark] = useState(() => {
@@ -82,6 +83,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       <footer className="border-t border-border py-6 text-center text-xs text-muted-foreground font-body">
         <p>一日一歩 — One step each day</p>
       </footer>
+      <SpotifyMiniPlayer />
     </div>
   );
 }
