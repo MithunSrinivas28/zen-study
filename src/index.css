@@ -15,10 +15,10 @@
     --popover: 0 0% 100%;
     --popover-foreground: 0 0% 11%;
 
-    --primary: 346 72% 81%;
-    --primary-foreground: 0 0% 11%;
+    --primary: 346 60% 72%;
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 220 25% 90%;
+    --secondary: 220 14% 90%;
     --secondary-foreground: 0 0% 11%;
 
     --muted: 36 18% 93%;
@@ -30,32 +30,29 @@
     --destructive: 0 65% 55%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 34 16% 88%;
-    --input: 34 16% 85%;
-    --ring: 346 72% 81%;
+    --border: 220 13% 91%;
+    --input: 220 13% 88%;
+    --ring: 346 60% 72%;
 
     --radius: 0.75rem;
 
     --sidebar-background: 36 18% 95%;
     --sidebar-foreground: 0 0% 11%;
-    --sidebar-primary: 346 72% 81%;
+    --sidebar-primary: 346 60% 72%;
     --sidebar-primary-foreground: 0 0% 100%;
     --sidebar-accent: 36 18% 90%;
     --sidebar-accent-foreground: 0 0% 11%;
-    --sidebar-border: 34 16% 88%;
-    --sidebar-ring: 346 72% 81%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 346 60% 72%;
 
-    --sakura: 346 72% 81%;
+    --sakura: 346 60% 72%;
     --sakura-light: 346 70% 92%;
-    --sakura-glow: 346 60% 75%;
+    --sakura-glow: 346 50% 63%;
     --indigo: 230 40% 25%;
     --indigo-light: 225 30% 40%;
     --stone: 30 10% 55%;
     --rice: 48 33% 97%;
     --ink: 0 0% 11%;
-
-    --panel-bg: 0 0% 100% / 0.92;
-    --overlay-bg: 0 0% 100% / 0.78;
   }
 
   .dark {
@@ -104,9 +101,6 @@
     --stone: 30 8% 50%;
     --rice: 230 35% 8%;
     --ink: 40 20% 90%;
-
-    --panel-bg: 230 40% 5% / 0.88;
-    --overlay-bg: 230 40% 5% / 0.75;
   }
 }
 
