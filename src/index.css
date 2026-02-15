@@ -6,53 +6,56 @@
 
 @layer base {
   :root {
-    --background: 40 30% 97%;
-    --foreground: 230 40% 15%;
+    --background: 48 33% 97%;
+    --foreground: 0 0% 11%;
 
-    --card: 30 25% 95%;
-    --card-foreground: 230 40% 15%;
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 11%;
 
-    --popover: 40 30% 97%;
-    --popover-foreground: 230 40% 15%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 11%;
 
-    --primary: 350 65% 72%;
-    --primary-foreground: 230 40% 12%;
+    --primary: 346 72% 81%;
+    --primary-foreground: 0 0% 11%;
 
     --secondary: 220 25% 90%;
-    --secondary-foreground: 230 40% 15%;
+    --secondary-foreground: 0 0% 11%;
 
-    --muted: 30 15% 92%;
-    --muted-foreground: 230 15% 50%;
+    --muted: 36 18% 93%;
+    --muted-foreground: 220 9% 46%;
 
     --accent: 230 40% 25%;
-    --accent-foreground: 40 30% 97%;
+    --accent-foreground: 48 33% 97%;
 
     --destructive: 0 65% 55%;
-    --destructive-foreground: 40 30% 97%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 30 15% 88%;
-    --input: 30 15% 85%;
-    --ring: 350 65% 72%;
+    --border: 34 16% 88%;
+    --input: 34 16% 85%;
+    --ring: 346 72% 81%;
 
     --radius: 0.75rem;
 
-    --sidebar-background: 30 25% 95%;
-    --sidebar-foreground: 230 40% 15%;
-    --sidebar-primary: 350 65% 72%;
-    --sidebar-primary-foreground: 40 30% 97%;
-    --sidebar-accent: 30 15% 90%;
-    --sidebar-accent-foreground: 230 40% 15%;
-    --sidebar-border: 30 15% 88%;
-    --sidebar-ring: 350 65% 72%;
+    --sidebar-background: 36 18% 95%;
+    --sidebar-foreground: 0 0% 11%;
+    --sidebar-primary: 346 72% 81%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 36 18% 90%;
+    --sidebar-accent-foreground: 0 0% 11%;
+    --sidebar-border: 34 16% 88%;
+    --sidebar-ring: 346 72% 81%;
 
-    --sakura: 350 65% 72%;
-    --sakura-light: 350 70% 90%;
-    --sakura-glow: 350 80% 82%;
+    --sakura: 346 72% 81%;
+    --sakura-light: 346 70% 92%;
+    --sakura-glow: 346 60% 75%;
     --indigo: 230 40% 25%;
     --indigo-light: 225 30% 40%;
     --stone: 30 10% 55%;
-    --rice: 40 30% 97%;
-    --ink: 230 40% 12%;
+    --rice: 48 33% 97%;
+    --ink: 0 0% 11%;
+
+    --panel-bg: 0 0% 100% / 0.92;
+    --overlay-bg: 0 0% 100% / 0.78;
   }
 
   .dark {
@@ -101,6 +104,9 @@
     --stone: 30 8% 50%;
     --rice: 230 35% 8%;
     --ink: 40 20% 90%;
+
+    --panel-bg: 230 40% 5% / 0.88;
+    --overlay-bg: 230 40% 5% / 0.75;
   }
 }
 
