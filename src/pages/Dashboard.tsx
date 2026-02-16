@@ -148,7 +148,7 @@ export default function Dashboard() {
   const daysSinceJoined = Math.max(1, Math.floor((Date.now() - new Date(profile.joined_at).getTime()) / 86400000));
 
   return (
-    <div className="container mx-auto max-w-lg px-4 py-16">
+    <div className="max-w-lg mx-auto py-8">
       <div className="text-center mb-12 animate-float-up">
         <p className="text-muted-foreground text-sm font-body mb-1">Welcome,</p>
         <h1 className="text-3xl font-serif font-bold text-foreground">{profile.username}</h1>

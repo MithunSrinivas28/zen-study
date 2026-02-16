@@ -6,7 +6,7 @@ export default function Index() {
   const { user } = useAuth();
 
   return (
-    <div className="container mx-auto max-w-2xl px-4 py-24 text-center">
+    <div className="max-w-2xl mx-auto py-16 text-center">
       <div className="animate-float-up">
         <p className="text-6xl mb-6">🌸</p>
         <h1 className="text-5xl font-serif font-bold text-foreground mb-4 tracking-tight">

@@ -6,53 +6,57 @@
 
 @layer base {
   :root {
-    --background: 48 33% 97%;
-    --foreground: 0 0% 11%;
+    --background: 40 18% 96%;
+    --foreground: 220 14% 10%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 0 0% 11%;
+    --card: 40 11% 97%;
+    --card-foreground: 220 14% 10%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 11%;
+    --popover-foreground: 220 14% 10%;
 
-    --primary: 346 60% 72%;
+    --primary: 346 55% 71%;
     --primary-foreground: 0 0% 100%;
 
     --secondary: 220 14% 90%;
-    --secondary-foreground: 0 0% 11%;
+    --secondary-foreground: 220 14% 10%;
 
-    --muted: 36 18% 93%;
+    --muted: 36 14% 93%;
     --muted-foreground: 220 9% 46%;
 
     --accent: 230 40% 25%;
-    --accent-foreground: 48 33% 97%;
+    --accent-foreground: 40 18% 96%;
 
     --destructive: 0 65% 55%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 220 13% 91%;
-    --input: 220 13% 88%;
-    --ring: 346 60% 72%;
+    --border: 36 12% 90%;
+    --input: 36 12% 87%;
+    --ring: 346 55% 71%;
 
     --radius: 0.75rem;
 
+    --canvas: 0 0% 100%;
+    --canvas-border: 36 12% 90%;
+    --canvas-shadow: 0 4px 24px -4px hsl(0 0% 0% / 0.06);
+
     --sidebar-background: 36 18% 95%;
-    --sidebar-foreground: 0 0% 11%;
-    --sidebar-primary: 346 60% 72%;
+    --sidebar-foreground: 220 14% 10%;
+    --sidebar-primary: 346 55% 71%;
     --sidebar-primary-foreground: 0 0% 100%;
     --sidebar-accent: 36 18% 90%;
-    --sidebar-accent-foreground: 0 0% 11%;
-    --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 346 60% 72%;
+    --sidebar-accent-foreground: 220 14% 10%;
+    --sidebar-border: 36 12% 90%;
+    --sidebar-ring: 346 55% 71%;
 
-    --sakura: 346 60% 72%;
+    --sakura: 346 55% 71%;
     --sakura-light: 346 70% 92%;
-    --sakura-glow: 346 50% 63%;
+    --sakura-glow: 346 45% 60%;
     --indigo: 230 40% 25%;
     --indigo-light: 225 30% 40%;
     --stone: 30 10% 55%;
-    --rice: 48 33% 97%;
-    --ink: 0 0% 11%;
+    --rice: 40 18% 96%;
+    --ink: 220 14% 10%;
   }
 
   .dark {
@@ -83,6 +87,10 @@
     --border: 230 20% 18%;
     --input: 230 20% 18%;
     --ring: 350 60% 68%;
+
+    --canvas: 230 30% 12%;
+    --canvas-border: 230 20% 18%;
+    --canvas-shadow: 0 4px 24px -4px hsl(0 0% 0% / 0.3);
 
     --sidebar-background: 230 30% 10%;
     --sidebar-foreground: 40 20% 90%;
