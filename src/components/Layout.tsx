@@ -3,6 +3,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { Moon, Sun } from "lucide-react";
 import { useEffect, useState } from "react";
 import SpotifyMiniPlayer from "@/components/SpotifyMiniPlayer";
+import MoodSelector, { useMood } from "@/components/MoodSelector";
 
 function useDarkMode() {
   const [dark, setDark] = useState(() => {
@@ -23,6 +24,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   const { user, signOut } = useAuth();
   const location = useLocation();
   const [dark, toggleDark] = useDarkMode();
+  const { mood, setMood } = useMood();
 
   const isActive = (path: string) => location.pathname === path;
 
@@ -69,6 +71,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 Login
               </Link>
             )}
+            <MoodSelector mood={mood} setMood={setMood} />
             <button
               onClick={toggleDark}
               aria-label="Toggle dark mode"
