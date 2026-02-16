@@ -105,6 +105,120 @@
   }
 }
 
+/* ── Mood overrides (light) ── */
+:root[data-mood="dawn"] {
+  --background: 30 40% 95%;
+  --card: 30 30% 97%;
+  --primary: 25 80% 60%;
+  --ring: 25 80% 60%;
+  --accent: 25 70% 50%;
+  --accent-foreground: 0 0% 100%;
+  --border: 30 25% 88%;
+  --muted: 30 25% 92%;
+  --sakura: 25 80% 60%;
+  --sakura-light: 30 60% 90%;
+  --sakura-glow: 20 70% 50%;
+}
+
+:root[data-mood="sunset"] {
+  --background: 15 35% 95%;
+  --card: 15 25% 97%;
+  --primary: 350 65% 62%;
+  --ring: 350 65% 62%;
+  --accent: 12 70% 55%;
+  --accent-foreground: 0 0% 100%;
+  --border: 15 20% 88%;
+  --muted: 15 20% 92%;
+  --sakura: 350 65% 62%;
+  --sakura-light: 10 50% 90%;
+  --sakura-glow: 350 55% 52%;
+}
+
+:root[data-mood="neon"] {
+  --background: 245 25% 95%;
+  --card: 245 18% 97%;
+  --primary: 265 55% 60%;
+  --ring: 265 55% 60%;
+  --accent: 250 50% 45%;
+  --accent-foreground: 0 0% 100%;
+  --border: 245 15% 88%;
+  --muted: 245 15% 92%;
+  --sakura: 265 55% 60%;
+  --sakura-light: 260 40% 90%;
+  --sakura-glow: 270 50% 50%;
+}
+
+:root[data-mood="grove"] {
+  --background: 100 20% 95%;
+  --card: 100 14% 97%;
+  --primary: 145 35% 45%;
+  --ring: 145 35% 45%;
+  --accent: 150 40% 35%;
+  --accent-foreground: 0 0% 100%;
+  --border: 100 12% 88%;
+  --muted: 100 12% 92%;
+  --sakura: 145 35% 45%;
+  --sakura-light: 140 25% 90%;
+  --sakura-glow: 150 30% 38%;
+}
+
+/* ── Mood overrides (dark) ── */
+.dark[data-mood="dawn"] {
+  --background: 25 30% 9%;
+  --card: 25 25% 13%;
+  --primary: 25 75% 60%;
+  --ring: 25 75% 60%;
+  --accent: 25 65% 55%;
+  --accent-foreground: 25 30% 9%;
+  --border: 25 20% 18%;
+  --muted: 25 18% 16%;
+  --sakura: 25 75% 60%;
+  --sakura-light: 25 30% 20%;
+  --sakura-glow: 20 65% 65%;
+}
+
+.dark[data-mood="sunset"] {
+  --background: 10 30% 9%;
+  --card: 10 25% 13%;
+  --primary: 350 60% 60%;
+  --ring: 350 60% 60%;
+  --accent: 12 65% 52%;
+  --accent-foreground: 10 30% 9%;
+  --border: 10 20% 18%;
+  --muted: 10 18% 16%;
+  --sakura: 350 60% 60%;
+  --sakura-light: 350 30% 20%;
+  --sakura-glow: 350 50% 65%;
+}
+
+.dark[data-mood="neon"] {
+  --background: 250 35% 8%;
+  --card: 250 30% 12%;
+  --primary: 265 55% 65%;
+  --ring: 265 55% 65%;
+  --accent: 260 50% 58%;
+  --accent-foreground: 250 35% 8%;
+  --border: 250 20% 18%;
+  --muted: 250 18% 16%;
+  --sakura: 265 55% 65%;
+  --sakura-light: 260 30% 20%;
+  --sakura-glow: 270 50% 70%;
+}
+
+.dark[data-mood="grove"] {
+  --background: 140 25% 8%;
+  --card: 140 20% 12%;
+  --primary: 145 40% 50%;
+  --ring: 145 40% 50%;
+  --accent: 150 35% 42%;
+  --accent-foreground: 140 25% 8%;
+  --border: 140 15% 18%;
+  --muted: 140 12% 16%;
+  --sakura: 145 40% 50%;
+  --sakura-light: 140 20% 20%;
+  --sakura-glow: 150 35% 55%;
+}
+
 @layer base {
   * {
     @apply border-border;
@@ -112,6 +226,7 @@
 
   body {
     @apply bg-background text-foreground font-body antialiased;
+    transition: background-color 0.4s ease, color 0.4s ease;
   }
 
   h1, h2, h3, h4, h5, h6 {
