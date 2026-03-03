@@ -122,6 +122,33 @@ export type Database = {
         }
         Relationships: []
       }
+      todo_tasks: {
+        Row: {
+          completed: boolean
+          created_at: string
+          id: string
+          task_date: string
+          title: string
+          user_id: string
+        }
+        Insert: {
+          completed?: boolean
+          created_at?: string
+          id?: string
+          task_date?: string
+          title: string
+          user_id: string
+        }
+        Update: {
+          completed?: boolean
+          created_at?: string
+          id?: string
+          task_date?: string
+          title?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
