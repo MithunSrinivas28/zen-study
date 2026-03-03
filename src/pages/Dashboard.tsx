@@ -1,30 +1,18 @@
-import { useEffect, useState, useCallback, useMemo } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
-import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import StreakGrid from "@/components/StreakGrid";
-import FloatingTimer from "@/components/FloatingTimer";
-import PipTimerContent from "@/components/PipTimerContent";
 import DailyCommitment from "@/components/DailyCommitment";
-import AnalyticsPanel from "@/components/AnalyticsPanel";
-import { usePictureInPicture } from "@/hooks/usePictureInPicture";
-import { PictureInPicture2 } from "lucide-react";
-import type { Json } from "@/integrations/supabase/types";
+import SakuraTree from "@/components/SakuraTree";
+import TimerMode from "@/components/TimerMode";
+import StopwatchMode from "@/components/StopwatchMode";
+import { useTimerState, type StudyMode } from "@/hooks/useTimerState";
 
 interface Profile {
   username: string;
   total_hours: number;
-  last_increment: string | null;
-  joined_at: string;
   points: number;
-}
-
-function formatCountdown(seconds: number): string {
-  const m = Math.floor(seconds / 60);
-  const s = seconds % 60;
-  return `${m}m ${s.toString().padStart(2, "0")}s`;
 }
 
 export default function Dashboard() {
@@ -32,35 +20,25 @@ export default function Dashboard() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [profile, setProfile] = useState<Profile | null>(null);
-  const [studyLogs, setStudyLogs] = useState<{ logged_at: string }[]>([]);
-  const [cooldown, setCooldown] = useState(0);
-  const [incrementing, setIncrementing] = useState(false);
+  const [sessions, setSessions] = useState<{ mode: string; duration_seconds: number; sessions_completed: number; created_at: string }[]>([]);
   const [commitment, setCommitment] = useState<{ target_hours: number } | null>(null);
-  const { isSupported: pipSupported, isOpen: pipOpen, toggle: togglePip, Portal: PipPortal } = usePictureInPicture();
+  const [studyLogs, setStudyLogs] = useState<{ logged_at: string }[]>([]);
 
-  const fetchProfile = useCallback(async () => {
+  const timer = useTimerState();
+
+  const fetchData = useCallback(async () => {
     if (!user) return;
-    const [{ data: profileData }, { data: logsData }, { data: commitData }] = await Promise.all([
-      supabase
-        .from("profiles")
-        .select("username, total_hours, last_increment, joined_at, points")
-        .eq("id", user.id)
-        .maybeSingle(),
-      supabase
-        .from("study_logs")
-        .select("logged_at")
-        .eq("user_id", user.id)
-        .order("logged_at", { ascending: false }),
-      supabase
-        .from("daily_commitments")
-        .select("target_hours")
-        .eq("user_id", user.id)
-        .eq("commitment_date", new Date().toISOString().split("T")[0])
-        .maybeSingle(),
+    const today = new Date().toISOString().split("T")[0];
+    const [{ data: p }, { data: sess }, { data: commitData }, { data: logs }] = await Promise.all([
+      supabase.from("profiles").select("username, total_hours, points").eq("id", user.id).maybeSingle(),
+      supabase.from("study_sessions").select("mode, duration_seconds, sessions_completed, created_at").eq("user_id", user.id).order("created_at", { ascending: false }),
+      supabase.from("daily_commitments").select("target_hours").eq("user_id", user.id).eq("commitment_date", today).maybeSingle(),
+      supabase.from("study_logs").select("logged_at").eq("user_id", user.id).order("logged_at", { ascending: false }),
     ]);
-    if (profileData) setProfile(profileData);
-    setStudyLogs(logsData ?? []);
+    if (p) setProfile(p);
+    setSessions(sess ?? []);
     setCommitment(commitData ?? null);
+    setStudyLogs(logs ?? []);
   }, [user]);
 
   useEffect(() => {
@@ -68,167 +46,113 @@ export default function Dashboard() {
       navigate("/auth");
       return;
     }
-    fetchProfile();
-  }, [user, authLoading, navigate, fetchProfile]);
+    fetchData();
+  }, [user, authLoading, navigate, fetchData]);
 
-  // Cooldown timer
-  useEffect(() => {
-    if (!profile?.last_increment) return;
-    const calcRemaining = () => {
-      const last = new Date(profile.last_increment!).getTime();
-      const remaining = Math.max(0, Math.ceil((last + 3600000 - Date.now()) / 1000));
-      setCooldown(remaining);
-    };
-    calcRemaining();
-    const interval = setInterval(calcRemaining, 1000);
-    return () => clearInterval(interval);
-  }, [profile?.last_increment]);
+  // Compute today's hours from study_logs
+  const todayStr = new Date().toISOString().split("T")[0];
+  const todayHours = studyLogs.filter((l) => l.logged_at.startsWith(todayStr)).length;
 
-  const handleIncrement = async () => {
-    if (!user) return;
-    setIncrementing(true);
-    const { data, error } = await supabase.rpc("increment_study_hour", {
-      p_user_id: user.id,
-    });
+  // Compute today's session stats
+  const todaySessions = sessions.filter((s) => s.created_at.startsWith(todayStr));
+  const todayTimerSessions = todaySessions.filter((s) => s.mode === "timer").reduce((sum, s) => sum + s.sessions_completed, 0);
+  const todayStopwatchMinutes = Math.floor(todaySessions.filter((s) => s.mode === "stopwatch").reduce((sum, s) => sum + s.duration_seconds, 0) / 60);
 
-    if (error) {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
-    } else {
-      const result = data as unknown as { success: boolean; error?: string; remaining_seconds?: number; points_earned?: number };
-      if (result.success) {
-        const pts = result.points_earned ?? 10;
-        toast({ title: "Study hour logged!", description: `+${pts} points 💪` });
-        await fetchProfile();
-      } else if (result.error === "cooldown") {
-        setCooldown(result.remaining_seconds ?? 0);
-        toast({
-          title: "Cooldown active",
-          description: `Wait ${formatCountdown(result.remaining_seconds ?? 0)}`,
-        });
-      }
-    }
-    setIncrementing(false);
-  };
-
-  // Compute analytics from study logs
-  const analytics = useMemo(() => {
-    const now = new Date();
-    const todayStr = now.toISOString().split("T")[0];
-    const weekAgo = new Date(now);
-    weekAgo.setDate(weekAgo.getDate() - 7);
-
-    let todayHours = 0;
-    let weekHours = 0;
-    const dayMap: Record<string, number> = {};
-
-    for (const log of studyLogs) {
-      const d = new Date(log.logged_at);
-      const dateStr = d.toISOString().split("T")[0];
-      dayMap[dateStr] = (dayMap[dateStr] ?? 0) + 1;
-      if (dateStr === todayStr) todayHours++;
-      if (d >= weekAgo) weekHours++;
-    }
-
-    const bestDayHours = Object.values(dayMap).length > 0 ? Math.max(...Object.values(dayMap)) : 0;
-    const totalDays = Object.keys(dayMap).length;
-    const avgHours = totalDays > 0 ? (studyLogs.length / totalDays) : 0;
-    const avgSessionLength = avgHours >= 1 ? `${avgHours.toFixed(1)}h` : "—";
-
-    return { todayHours, weekHours, bestDayHours, avgSessionLength };
-  }, [studyLogs]);
+  // Total for tree
+  const totalSessions = sessions.reduce((sum, s) => sum + s.sessions_completed, 0);
 
   if (authLoading || !profile) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
-        <p className="text-muted-foreground font-body animate-pulse-sakura">Loading...</p>
+        <p className="text-muted-foreground font-body animate-pulse">Loading...</p>
       </div>
     );
   }
 
-  const daysSinceJoined = Math.max(1, Math.floor((Date.now() - new Date(profile.joined_at).getTime()) / 86400000));
-
   return (
-    <div className="max-w-lg mx-auto py-8">
-      <div className="text-center mb-12 animate-float-up">
+    <div className="max-w-lg mx-auto py-8 px-4">
+      {/* Welcome */}
+      <div className="text-center mb-6">
         <p className="text-muted-foreground text-sm font-body mb-1">Welcome,</p>
         <h1 className="text-3xl font-serif font-bold text-foreground">{profile.username}</h1>
       </div>
 
-      <div className="grid grid-cols-2 gap-4 mb-8">
-        <div className="bg-card rounded-lg border border-border p-6 text-center">
-          <p className="text-4xl font-serif font-bold text-foreground">{profile.total_hours}</p>
-          <p className="text-xs text-muted-foreground font-body mt-1">Total Hours</p>
-        </div>
-        <div className="bg-card rounded-lg border border-border p-6 text-center">
-          <p className="text-4xl font-serif font-bold text-foreground">{daysSinceJoined}</p>
-          <p className="text-xs text-muted-foreground font-body mt-1">Days Active</p>
-        </div>
+      {/* Sakura Tree */}
+      <div className="mb-6">
+        <SakuraTree totalHours={profile.total_hours} totalSessions={totalSessions} />
       </div>
 
-      {/* Daily Commitment */}
-      <div className="mb-8">
-        <DailyCommitment
-          userId={user!.id}
-          todayHours={analytics.todayHours}
-          commitment={commitment}
-          onCommitmentSet={fetchProfile}
-        />
-      </div>
-
-      {/* Prominent +1 Hour Button */}
-      <div className="mb-8">
-        {cooldown > 0 ? (
-          <div className="text-center space-y-3">
-            <Button disabled className="w-full max-w-sm mx-auto bg-muted text-muted-foreground font-body text-lg py-7 cursor-not-allowed rounded-xl">
-              Cooldown — {formatCountdown(cooldown)}
-            </Button>
-            <p className="text-xs text-muted-foreground font-body">Rest and return when the timer completes</p>
-            {pipSupported && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={togglePip}
-                className="font-body gap-2"
-              >
-                <PictureInPicture2 size={16} />
-                {pipOpen ? "Close Float" : "Float Timer"}
-              </Button>
-            )}
-          </div>
-        ) : (
-          <Button
-            onClick={handleIncrement}
-            disabled={incrementing}
-            className="w-full max-w-sm mx-auto bg-accent text-accent-foreground hover:bg-accent/90 font-body text-xl py-8 rounded-xl transition-all active:scale-95 shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
+      {/* Mode Selector */}
+      <div className="flex justify-center gap-3 mb-6">
+        {(["timer", "stopwatch"] as StudyMode[]).map((m) => (
+          <button
+            key={m}
+            onClick={() => timer.setMode(m)}
+            disabled={timer.isRunning}
+            className={`px-5 py-2.5 rounded-lg text-sm font-body border transition-colors ${
+              timer.mode === m
+                ? "bg-primary text-primary-foreground border-primary"
+                : "bg-card border-border text-muted-foreground hover:border-primary/50"
+            } disabled:opacity-50`}
           >
-            <span className="text-2xl">＋</span>
-            {incrementing ? "Logging..." : "1 Hour"}
-          </Button>
+            {m === "timer" ? "⏱ Timer" : "⏱ Stopwatch"}
+          </button>
+        ))}
+      </div>
+
+      {/* Active Mode */}
+      <div className="bg-card rounded-lg border border-border p-6 mb-6">
+        {timer.mode === "timer" ? (
+          <TimerMode
+            userId={user!.id}
+            phase={timer.phase}
+            isRunning={timer.isRunning}
+            remaining={timer.remaining}
+            elapsed={timer.elapsed}
+            intervalType={timer.intervalType}
+            sessionsCompleted={timer.sessionsCompleted}
+            focusDuration={timer.focusDuration}
+            onSetIntervalType={timer.setIntervalType}
+            onStart={timer.start}
+            onPause={timer.pause}
+            onCompleteSession={timer.completeTimerSession}
+            onSessionLogged={fetchData}
+          />
+        ) : (
+          <StopwatchMode
+            userId={user!.id}
+            isRunning={timer.isRunning}
+            elapsed={timer.elapsed}
+            phase={timer.phase}
+            onStart={timer.start}
+            onPause={timer.pause}
+            onStop={timer.stop}
+            onSessionLogged={fetchData}
+          />
         )}
       </div>
 
-      {/* Analytics Panel */}
-      <div className="mb-8">
-        <AnalyticsPanel
-          points={profile.points}
-          weekHours={analytics.weekHours}
-          bestDayHours={analytics.bestDayHours}
-          avgSessionLength={analytics.avgSessionLength}
+      {/* Daily Commitment (single goal section) */}
+      <div className="mb-6">
+        <DailyCommitment
+          userId={user!.id}
+          todayHours={todayHours + Math.floor(todayStopwatchMinutes / 60)}
+          commitment={commitment}
+          onCommitmentSet={fetchData}
         />
       </div>
 
-      <div className="mb-8">
-        <h2 className="text-sm font-body text-muted-foreground mb-3 text-center">Study Activity</h2>
-        <div className="bg-card rounded-lg border border-border p-4 overflow-hidden">
-          <StreakGrid logs={studyLogs} />
+      {/* Today's quick stats */}
+      <div className="grid grid-cols-2 gap-3 mb-6">
+        <div className="bg-card rounded-lg border border-border p-4 text-center">
+          <p className="text-2xl font-serif font-bold text-foreground">{todayTimerSessions}</p>
+          <p className="text-xs text-muted-foreground font-body">Timer Sessions</p>
+        </div>
+        <div className="bg-card rounded-lg border border-border p-4 text-center">
+          <p className="text-2xl font-serif font-bold text-foreground">{todayStopwatchMinutes}m</p>
+          <p className="text-xs text-muted-foreground font-body">Stopwatch Time</p>
         </div>
       </div>
-
-      <FloatingTimer cooldown={cooldown} />
-
-      <PipPortal>
-        <PipTimerContent cooldown={cooldown} />
-      </PipPortal>
     </div>
   );
 }

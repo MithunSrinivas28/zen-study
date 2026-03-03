@@ -1,0 +1,98 @@
+import { Button } from "@/components/ui/button";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
+
+interface StopwatchModeProps {
+  userId: string;
+  isRunning: boolean;
+  elapsed: number; // seconds
+  phase: string;
+  onStart: () => void;
+  onPause: () => void;
+  onStop: () => number;
+  onSessionLogged: () => void;
+}
+
+function formatElapsed(seconds: number) {
+  const h = Math.floor(seconds / 3600);
+  const m = Math.floor((seconds % 3600) / 60);
+  const s = seconds % 60;
+  if (h > 0) return `${h}h ${m.toString().padStart(2, "0")}m`;
+  return `${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
+}
+
+export default function StopwatchMode({
+  userId,
+  isRunning,
+  elapsed,
+  phase,
+  onStart,
+  onPause,
+  onStop,
+  onSessionLogged,
+}: StopwatchModeProps) {
+  const { toast } = useToast();
+
+  const handleStop = async () => {
+    const totalSeconds = onStop();
+    if (totalSeconds < 60) {
+      toast({ title: "Too short", description: "Study at least 1 minute to log.", variant: "destructive" });
+      return;
+    }
+    const { error } = await supabase.from("study_sessions").insert({
+      user_id: userId,
+      mode: "stopwatch",
+      duration_seconds: totalSeconds,
+      sessions_completed: 1,
+    });
+    if (error) {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "Session saved!", description: `${formatElapsed(totalSeconds)} logged 💪` });
+      onSessionLogged();
+    }
+  };
+
+  const hasStarted = phase !== "idle" || elapsed > 0;
+
+  return (
+    <div className="space-y-6">
+      {/* Display */}
+      <div className="text-center">
+        <p className="text-xs text-muted-foreground font-body mb-2 uppercase tracking-wide">
+          {isRunning ? "Studying..." : hasStarted ? "Paused" : "Ready"}
+        </p>
+        <p className="text-6xl font-serif font-bold text-foreground tabular-nums tracking-tight">
+          {formatElapsed(elapsed)}
+        </p>
+      </div>
+
+      {/* Controls */}
+      <div className="flex justify-center gap-3">
+        {!hasStarted ? (
+          <Button onClick={onStart} className="font-body px-8">
+            Start Studying
+          </Button>
+        ) : isRunning ? (
+          <>
+            <Button onClick={onPause} variant="outline" className="font-body px-6">
+              Pause
+            </Button>
+            <Button onClick={handleStop} variant="secondary" className="font-body px-6">
+              Stop & Save
+            </Button>
+          </>
+        ) : (
+          <>
+            <Button onClick={onStart} className="font-body px-6">
+              Resume
+            </Button>
+            <Button onClick={handleStop} variant="secondary" className="font-body px-6">
+              Stop & Save
+            </Button>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}

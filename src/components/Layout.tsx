@@ -4,6 +4,9 @@ import { Moon, Sun } from "lucide-react";
 import { useEffect, useState } from "react";
 import SpotifyMiniPlayer from "@/components/SpotifyMiniPlayer";
 import MoodSelector, { useMood } from "@/components/MoodSelector";
+import FloatingTimer from "@/components/FloatingTimer";
+import TodoPanel from "@/components/TodoPanel";
+import { useTimerState } from "@/hooks/useTimerState";
 
 function useDarkMode() {
   const [dark, setDark] = useState(() => {
@@ -25,8 +28,12 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   const location = useLocation();
   const [dark, toggleDark] = useDarkMode();
   const { mood, setMood } = useMood();
+  const timer = useTimerState();
 
   const isActive = (path: string) => location.pathname === path;
+
+  // Show floating timer when timer is running and not on dashboard
+  const showFloatingTimer = timer.isRunning && location.pathname !== "/dashboard";
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -53,6 +60,14 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                   }`}
                 >
                   Dashboard
+                </Link>
+                <Link
+                  to="/profile"
+                  className={`transition-colors hover:text-foreground ${
+                    isActive("/profile") ? "text-foreground font-medium" : "text-muted-foreground"
+                  }`}
+                >
+                  Profile
                 </Link>
                 <button
                   onClick={signOut}
@@ -90,7 +105,20 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       <footer className="border-t border-border py-6 text-center text-xs text-muted-foreground font-body">
         <p>一日一歩 — One step each day</p>
       </footer>
+
+      {/* Global floating timer - persists across routes */}
+      {showFloatingTimer && (
+        <FloatingTimer
+          cooldown={timer.mode === "timer" ? timer.remaining : 0}
+          mode={timer.mode}
+          elapsed={timer.elapsed}
+          phase={timer.phase}
+          isRunning={timer.isRunning}
+        />
+      )}
+
       <SpotifyMiniPlayer />
+      <TodoPanel />
     </div>
   );
 }
