@@ -38,8 +38,162 @@ export type Database = {
         }
         Relationships: []
       }
+      focus_participants: {
+        Row: {
+          created_at: string
+          id: string
+          joined_at: string | null
+          left_at: string | null
+          points_earned: number
+          session_id: string
+          status: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          joined_at?: string | null
+          left_at?: string | null
+          points_earned?: number
+          session_id: string
+          status?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          joined_at?: string | null
+          left_at?: string | null
+          points_earned?: number
+          session_id?: string
+          status?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "focus_participants_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "focus_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      focus_sessions: {
+        Row: {
+          break_duration: number
+          created_at: string
+          created_by: string
+          ended_at: string | null
+          focus_duration: number
+          id: string
+          started_at: string | null
+          status: string
+        }
+        Insert: {
+          break_duration?: number
+          created_at?: string
+          created_by: string
+          ended_at?: string | null
+          focus_duration?: number
+          id?: string
+          started_at?: string | null
+          status?: string
+        }
+        Update: {
+          break_duration?: number
+          created_at?: string
+          created_by?: string
+          ended_at?: string | null
+          focus_duration?: number
+          id?: string
+          started_at?: string | null
+          status?: string
+        }
+        Relationships: []
+      }
+      friend_requests: {
+        Row: {
+          created_at: string
+          from_user_id: string
+          id: string
+          status: string
+          to_user_id: string
+        }
+        Insert: {
+          created_at?: string
+          from_user_id: string
+          id?: string
+          status?: string
+          to_user_id: string
+        }
+        Update: {
+          created_at?: string
+          from_user_id?: string
+          id?: string
+          status?: string
+          to_user_id?: string
+        }
+        Relationships: []
+      }
+      friendships: {
+        Row: {
+          created_at: string
+          friend_id: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          friend_id: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          friend_id?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      notifications: {
+        Row: {
+          body: string | null
+          created_at: string
+          data: Json | null
+          id: string
+          read: boolean
+          title: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          body?: string | null
+          created_at?: string
+          data?: Json | null
+          id?: string
+          read?: boolean
+          title: string
+          type: string
+          user_id: string
+        }
+        Update: {
+          body?: string | null
+          created_at?: string
+          data?: Json | null
+          id?: string
+          read?: boolean
+          title?: string
+          type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
+          battle_points: number
+          battle_wins: number
           created_at: string
           id: string
           joined_at: string
@@ -51,6 +205,8 @@ export type Database = {
           username: string
         }
         Insert: {
+          battle_points?: number
+          battle_wins?: number
           created_at?: string
           id: string
           joined_at?: string
@@ -62,6 +218,8 @@ export type Database = {
           username: string
         }
         Update: {
+          battle_points?: number
+          battle_wins?: number
           created_at?: string
           id?: string
           joined_at?: string
@@ -157,6 +315,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_username: { Args: { p_user_id: string }; Returns: string }
       increment_study_hour: { Args: { p_user_id: string }; Returns: Json }
       increment_study_minutes: {
         Args: { p_minutes: number; p_user_id: string }

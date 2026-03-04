@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import DailyCommitment from "@/components/DailyCommitment";
 import SakuraTree from "@/components/SakuraTree";
+import FocusRooms from "@/components/FocusRooms";
 import TimerMode from "@/components/TimerMode";
 import StopwatchMode from "@/components/StopwatchMode";
 import { useTimerState, type StudyMode } from "@/hooks/useTimerState";
@@ -152,6 +153,11 @@ export default function Dashboard() {
           <p className="text-2xl font-serif font-bold text-foreground">{todayStopwatchMinutes}m</p>
           <p className="text-xs text-muted-foreground font-body">Stopwatch Time</p>
         </div>
+      </div>
+
+      {/* Focus Rooms */}
+      <div className="mb-6">
+        <FocusRooms />
       </div>
     </div>
   );
