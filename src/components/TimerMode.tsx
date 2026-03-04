@@ -46,17 +46,18 @@ export default function TimerMode({
     if (isRunning && remaining <= 0 && phase !== "idle") {
       if (phase === "focus" && !loggedRef.current) {
         loggedRef.current = true;
-        // Log completed focus session
-        supabase
-          .from("study_sessions")
-          .insert({
+        const minutesEarned = Math.round(focusDuration / 60);
+        // Log completed focus session & update profile minutes
+        Promise.all([
+          supabase.from("study_sessions").insert({
             user_id: userId,
             mode: "timer",
             duration_seconds: focusDuration,
             sessions_completed: 1,
             interval_type: intervalType,
-          })
-          .then(() => {
+          }),
+          supabase.rpc("increment_study_minutes" as any, { p_user_id: userId, p_minutes: minutesEarned }),
+        ]).then(() => {
             onSessionLogged();
             loggedRef.current = false;
           });

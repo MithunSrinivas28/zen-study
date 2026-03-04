@@ -39,12 +39,16 @@ export default function StopwatchMode({
       toast({ title: "Too short", description: "Study at least 1 minute to log.", variant: "destructive" });
       return;
     }
-    const { error } = await supabase.from("study_sessions").insert({
-      user_id: userId,
-      mode: "stopwatch",
-      duration_seconds: totalSeconds,
-      sessions_completed: 1,
-    });
+    const minutesEarned = Math.floor(totalSeconds / 60);
+    const [{ error }] = await Promise.all([
+      supabase.from("study_sessions").insert({
+        user_id: userId,
+        mode: "stopwatch",
+        duration_seconds: totalSeconds,
+        sessions_completed: 1,
+      }),
+      supabase.rpc("increment_study_minutes" as any, { p_user_id: userId, p_minutes: minutesEarned }),
+    ]);
     if (error) {
       toast({ title: "Error", description: error.message, variant: "destructive" });
     } else {

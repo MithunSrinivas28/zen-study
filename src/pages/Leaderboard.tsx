@@ -6,6 +6,7 @@ import { Crown, Medal, Award } from "lucide-react";
 interface LeaderboardEntry {
   username: string;
   total_hours: number;
+  total_study_minutes: number;
   joined_at: string;
 }
 
@@ -33,8 +34,8 @@ export default function Leaderboard() {
       const [{ data: leaderboard }, profileResult] = await Promise.all([
         supabase
           .from("profiles")
-          .select("username, total_hours, joined_at")
-          .order("total_hours", { ascending: false })
+          .select("username, total_hours, total_study_minutes, joined_at")
+          .order("total_study_minutes", { ascending: false })
           .limit(20),
         user
           ? supabase.from("profiles").select("username").eq("id", user.id).maybeSingle()
@@ -55,7 +56,7 @@ export default function Leaderboard() {
     );
   }
 
-  const leaderHours = entries.length > 0 ? entries[0].total_hours : 0;
+  const leaderMinutes = entries.length > 0 ? entries[0].total_study_minutes : 0;
 
   return (
     <div className="container mx-auto max-w-2xl px-4 py-16">
@@ -72,7 +73,12 @@ export default function Leaderboard() {
             const rank = i + 1;
             const config = rankConfig[rank];
             const isCurrentUser = currentUsername === entry.username;
-            const gap = leaderHours - entry.total_hours;
+            const totalMin = entry.total_study_minutes;
+            const displayH = Math.floor(totalMin / 60);
+            const displayM = totalMin % 60;
+            const gap = leaderMinutes - totalMin;
+            const gapH = Math.floor(gap / 60);
+            const gapM = gap % 60;
             const daysSinceJoined = Math.max(
               1,
               Math.floor((Date.now() - new Date(entry.joined_at).getTime()) / 86400000)
@@ -127,12 +133,12 @@ export default function Leaderboard() {
                       rank === 1 ? "text-2xl" : rank <= 3 ? "text-xl" : "text-lg"
                     }`}
                   >
-                    {entry.total_hours}
-                    <span className="text-xs text-muted-foreground font-body ml-1">h</span>
+                    {displayH}<span className="text-xs text-muted-foreground font-body ml-0.5">h</span>
+                    {" "}{displayM}<span className="text-xs text-muted-foreground font-body ml-0.5">m</span>
                   </p>
                   {rank > 1 && gap > 0 && (
                     <p className="text-xs text-muted-foreground font-body">
-                      {gap}h behind
+                      {gapH > 0 ? `${gapH}h ` : ""}{gapM}m behind
                     </p>
                   )}
                 </div>
