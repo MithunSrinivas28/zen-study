@@ -62,12 +62,13 @@ export default function TodoPanel() {
   };
 
   const handleMouseEnter = () => {
+    if (hoverTimeout.current) clearTimeout(hoverTimeout.current);
     hoverTimeout.current = setTimeout(() => setOpen(true), 200);
   };
 
   const handleMouseLeave = () => {
     if (hoverTimeout.current) clearTimeout(hoverTimeout.current);
-    setOpen(false);
+    hoverTimeout.current = setTimeout(() => setOpen(false), 300);
   };
 
   if (!user) return null;
@@ -88,7 +89,7 @@ export default function TodoPanel() {
 
       {/* Expanded panel */}
       {open && (
-        <div className="bg-card border border-r-0 border-border rounded-l-xl shadow-lg w-72 max-h-[70vh] flex flex-col animate-float-up">
+        <div className="bg-card border border-r-0 border-border rounded-l-xl shadow-lg w-[340px] max-h-[70vh] flex flex-col animate-float-up">
           <div className="flex items-center justify-between px-4 py-3 border-b border-border">
             <h3 className="text-sm font-serif font-bold text-foreground">Today's Tasks</h3>
             <button onClick={() => setOpen(false)} className="text-muted-foreground hover:text-foreground">

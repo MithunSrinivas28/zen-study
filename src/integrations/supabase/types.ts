@@ -46,6 +46,7 @@ export type Database = {
           last_increment: string | null
           points: number
           total_hours: number
+          total_study_minutes: number
           updated_at: string
           username: string
         }
@@ -56,6 +57,7 @@ export type Database = {
           last_increment?: string | null
           points?: number
           total_hours?: number
+          total_study_minutes?: number
           updated_at?: string
           username: string
         }
@@ -66,6 +68,7 @@ export type Database = {
           last_increment?: string | null
           points?: number
           total_hours?: number
+          total_study_minutes?: number
           updated_at?: string
           username?: string
         }
@@ -155,6 +158,10 @@ export type Database = {
     }
     Functions: {
       increment_study_hour: { Args: { p_user_id: string }; Returns: Json }
+      increment_study_minutes: {
+        Args: { p_minutes: number; p_user_id: string }
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never
