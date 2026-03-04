@@ -6,6 +6,7 @@ import SpotifyMiniPlayer from "@/components/SpotifyMiniPlayer";
 import MoodSelector, { useMood } from "@/components/MoodSelector";
 import FloatingTimer from "@/components/FloatingTimer";
 import TodoPanel from "@/components/TodoPanel";
+import NotificationBell from "@/components/NotificationBell";
 import { useTimerState } from "@/hooks/useTimerState";
 
 function useDarkMode() {
@@ -86,6 +87,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 Login
               </Link>
             )}
+            {user && <NotificationBell />}
             <MoodSelector mood={mood} setMood={setMood} />
             <button
               onClick={toggleDark}
