@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useFriends } from "@/hooks/useFriends";
 import { useFocusSession } from "@/hooks/useFocusSession";
 import { useAuth } from "@/hooks/useAuth";
@@ -15,6 +16,7 @@ function formatTime(seconds: number) {
 
 export default function FocusRooms() {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const { toast } = useToast();
   const { friends, incomingRequests, sendRequest, acceptRequest, declineRequest, loading: friendsLoading } = useFriends();
   const {
@@ -29,76 +31,13 @@ export default function FocusRooms() {
 
   if (!user) return null;
 
-  // If in active session, show the study room
-  if (activeSession && activeSession.status === "in_progress") {
-    const phase = isFocusPhase ? "Focus" : isBreakPhase ? "Break" : "Complete";
-    const progress = isFocusPhase
-      ? elapsed / activeSession.focus_duration
-      : isBreakPhase
-      ? (elapsed - activeSession.focus_duration) / activeSession.break_duration
-      : 1;
-
-    // Auto-complete when session time is fully elapsed
-    if (isCompleted) {
-      completeSession();
-    }
-
-    return (
-      <div className="bg-card rounded-lg border border-border p-6">
-        <div className="text-center mb-4">
-          <p className="text-xs text-muted-foreground font-body uppercase tracking-wide mb-1">
-            Shared {phase}
-          </p>
-          <p className="text-5xl font-serif font-bold text-foreground tabular-nums tracking-tight">
-            {formatTime(Math.max(0, phaseRemaining))}
-          </p>
-        </div>
-
-        {/* Progress bar */}
-        <div className="w-full h-1.5 bg-muted rounded-full overflow-hidden mb-4">
-          <div
-            className="h-full bg-primary rounded-full transition-all duration-500"
-            style={{ width: `${Math.min(100, progress * 100)}%` }}
-          />
-        </div>
-
-        {/* Participants */}
-        <div className="flex justify-center gap-4 mb-4">
-          {participants.filter((p) => p.status === "joined").map((p) => (
-            <div key={p.id} className="text-center">
-              <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center mx-auto mb-1">
-                <span className="text-sm font-serif font-bold text-primary">
-                  {(p.username ?? "?")[0].toUpperCase()}
-                </span>
-              </div>
-              <p className="text-xs font-body text-muted-foreground">{p.username}</p>
-            </div>
-          ))}
-        </div>
-
-        <div className="flex justify-center">
-          <Button variant="destructive" size="sm" onClick={leaveSession} className="font-body">
-            <LogOut size={14} className="mr-1" /> Leave Session
-          </Button>
-        </div>
-      </div>
-    );
+  // If in active session, redirect to the room page
+  if (activeSession && (activeSession.status === "in_progress" || activeSession.status === "pending")) {
+    navigate(`/focus-room/${activeSession.id}`);
+    return null;
   }
 
-  // Pending session (waiting for friend to accept)
-  if (activeSession && activeSession.status === "pending") {
-    const invitedPerson = participants.find((p) => p.status === "invited");
-    return (
-      <div className="bg-card rounded-lg border border-border p-6 text-center">
-        <Clock size={24} className="mx-auto mb-2 text-muted-foreground" />
-        <p className="font-body text-sm text-foreground mb-1">Waiting for {invitedPerson?.username ?? "friend"} to join...</p>
-        <p className="text-xs text-muted-foreground font-body">They've been notified</p>
-        <Button variant="outline" size="sm" className="mt-3 font-body" onClick={leaveSession}>
-          Cancel
-        </Button>
-      </div>
-    );
-  }
+  // No more pending session display here - handled by /focus-room/:roomId
 
   const handleAddFriend = async () => {
     if (!friendUsername.trim()) return;
@@ -116,8 +55,13 @@ export default function FocusRooms() {
   const handleInvite = async (friendId: string) => {
     const sessionId = await createSession(friendId);
     if (sessionId) {
-      toast({ title: "Invite sent!", description: "Waiting for your friend to join..." });
+      navigate(`/focus-room/${sessionId}`);
     }
+  };
+
+  const handleAcceptInvite = async (participantId: string, sessionId: string) => {
+    await acceptInvite(participantId, sessionId);
+    navigate(`/focus-room/${sessionId}`);
   };
 
   return (
@@ -137,7 +81,7 @@ export default function FocusRooms() {
                 <p className="text-xs text-muted-foreground font-body">50 min focus session</p>
               </div>
               <div className="flex gap-1">
-                <Button size="sm" className="h-7 px-2 font-body" onClick={() => acceptInvite(inv.id, inv.session_id)}>
+                <Button size="sm" className="h-7 px-2 font-body" onClick={() => handleAcceptInvite(inv.id, inv.session_id)}>
                   <Check size={12} />
                 </Button>
                 <Button size="sm" variant="outline" className="h-7 px-2 font-body" onClick={() => declineInvite(inv.id)}>
