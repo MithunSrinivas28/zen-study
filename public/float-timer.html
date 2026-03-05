@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shūkan Timer</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Georgia', serif;
+    background: #0c0c0c;
+    color: #e8e4df;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    overflow: hidden;
+    user-select: none;
+  }
+  .phase {
+    font-family: system-ui, sans-serif;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: #8a8580;
+    margin-bottom: 6px;
+  }
+  .time {
+    font-size: 42px;
+    font-weight: 700;
+    letter-spacing: -1px;
+    font-variant-numeric: tabular-nums;
+  }
+  .progress-bar {
+    width: 80%;
+    height: 3px;
+    background: #2a2725;
+    border-radius: 2px;
+    margin-top: 10px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: #c9a87c;
+    border-radius: 2px;
+    transition: width 0.5s ease;
+  }
+  .compact .phase, .compact .progress-bar { display: none; }
+  .compact .time { font-size: 36px; }
+  .controls {
+    position: absolute;
+    bottom: 6px;
+    right: 8px;
+    display: flex;
+    gap: 6px;
+  }
+  .controls button {
+    background: none;
+    border: 1px solid #333;
+    color: #8a8580;
+    font-size: 9px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: system-ui, sans-serif;
+  }
+  .controls button:hover { color: #e8e4df; border-color: #555; }
+  .idle { color: #5a5550; }
+</style>
+</head>
+<body>
+  <div id="root">
+    <div class="phase" id="phase">Ready</div>
+    <div class="time" id="time">00:00</div>
+    <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+  </div>
+  <div class="controls">
+    <button id="compact-btn">Compact</button>
+  </div>
+<script>
+const STORAGE_KEY = 'shukan-timer-state';
+let isCompact = false;
+
+document.getElementById('compact-btn').addEventListener('click', () => {
+  isCompact = !isCompact;
+  document.body.classList.toggle('compact', isCompact);
+  document.getElementById('compact-btn').textContent = isCompact ? 'Full' : 'Compact';
+  // Resize window for compact mode
+  try {
+    if (isCompact) {
+      window.resizeTo(180, 80);
+    } else {
+      window.resizeTo(220, 140);
+    }
+  } catch(e) {}
+});
+
+function fmt(seconds) {
+  const m = Math.floor(seconds / 60);
+  const s = seconds % 60;
+  return m.toString().padStart(2, '0') + ':' + s.toString().padStart(2, '0');
+}
+
+function fmtElapsed(seconds) {
+  const h = Math.floor(seconds / 3600);
+  const m = Math.floor((seconds % 3600) / 60);
+  const s = seconds % 60;
+  if (h > 0) return h + 'h ' + m.toString().padStart(2, '0') + 'm';
+  return m.toString().padStart(2, '0') + ':' + s.toString().padStart(2, '0');
+}
+
+function tick() {
+  const phaseEl = document.getElementById('phase');
+  const timeEl = document.getElementById('time');
+  const progressEl = document.getElementById('progress');
+
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) {
+      phaseEl.textContent = 'No session';
+      timeEl.textContent = '--:--';
+      timeEl.className = 'time idle';
+      progressEl.style.width = '0%';
+      return;
+    }
+    const st = JSON.parse(raw);
+    const today = new Date().toISOString().split('T')[0];
+    if (st._date !== today) {
+      phaseEl.textContent = 'No session';
+      timeEl.textContent = '--:--';
+      timeEl.className = 'time idle';
+      progressEl.style.width = '0%';
+      return;
+    }
+
+    // Calculate elapsed
+    let elapsed = 0;
+    if (st.sessionStartTimestamp) {
+      if (st.pauseTimestamp) {
+        elapsed = Math.floor(st.pauseAccumulated / 1000);
+      } else if (st.isRunning) {
+        elapsed = Math.floor((st.pauseAccumulated + Date.now() - st.sessionStartTimestamp) / 1000);
+      } else {
+        elapsed = Math.floor(st.pauseAccumulated / 1000);
+      }
+    }
+
+    const isStopwatch = st.mode === 'stopwatch';
+    const isIdle = st.phase === 'idle';
+
+    if (isIdle && !st.isRunning) {
+      phaseEl.textContent = 'Ready';
+      timeEl.textContent = isStopwatch ? '00:00' : fmt(st.focusDuration || 1500);
+      timeEl.className = 'time idle';
+      progressEl.style.width = '0%';
+      return;
+    }
+
+    timeEl.className = 'time';
+
+    if (isStopwatch) {
+      phaseEl.textContent = st.isRunning ? 'Studying...' : 'Paused';
+      timeEl.textContent = fmtElapsed(elapsed);
+      progressEl.style.width = '0%';
+    } else {
+      const duration = st.phase === 'break' ? (st.breakDuration || 300) : (st.focusDuration || 1500);
+      const remaining = Math.max(0, duration - elapsed);
+      const progress = Math.min(100, ((duration - remaining) / duration) * 100);
+
+      if (st.phase === 'focus') {
+        phaseEl.textContent = st.isRunning ? 'Focus' : 'Focus (paused)';
+      } else if (st.phase === 'break') {
+        phaseEl.textContent = st.isRunning ? 'Break' : 'Break (paused)';
+      }
+
+      timeEl.textContent = fmt(remaining);
+      progressEl.style.width = progress + '%';
+    }
+  } catch(e) {
+    // ignore
+  }
+}
+
+tick();
+setInterval(tick, 500);
+
+// Update title
+setInterval(() => {
+  const t = document.getElementById('time').textContent;
+  document.title = t + ' — Shūkan';
+}, 1000);
+</script>
+</body>
+</html>
