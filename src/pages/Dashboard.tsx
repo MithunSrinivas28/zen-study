@@ -24,6 +24,7 @@ export default function Dashboard() {
   const [sessions, setSessions] = useState<{ mode: string; duration_seconds: number; sessions_completed: number; created_at: string }[]>([]);
   const [commitment, setCommitment] = useState<{ target_hours: number } | null>(null);
   const [studyLogs, setStudyLogs] = useState<{ logged_at: string }[]>([]);
+  const [showFocusRooms, setShowFocusRooms] = useState(false);
 
   const timer = useTimerState();
 
@@ -70,6 +71,7 @@ export default function Dashboard() {
     );
   }
 
+
   return (
     <div className="max-w-lg mx-auto py-8 px-4">
       {/* Welcome */}
@@ -77,6 +79,21 @@ export default function Dashboard() {
         <p className="text-muted-foreground text-sm font-body mb-1">Welcome,</p>
         <h1 className="text-3xl font-serif font-bold text-foreground">{profile.username}</h1>
       </div>
+
+      {/* Start Study Together */}
+      <button
+        onClick={() => setShowFocusRooms((v) => !v)}
+        className="w-full mb-6 bg-primary/10 hover:bg-primary/20 border border-primary/30 rounded-lg px-5 py-3 text-center transition-colors"
+      >
+        <span className="font-serif font-bold text-foreground text-sm">🤝 Start Study Together</span>
+        <p className="text-xs text-muted-foreground font-body mt-0.5">Invite a friend to a shared focus session</p>
+      </button>
+
+      {showFocusRooms && (
+        <div className="mb-6">
+          <FocusRooms />
+        </div>
+      )}
 
       {/* Sakura Tree */}
       <div className="mb-6">
@@ -155,10 +172,7 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Focus Rooms */}
-      <div className="mb-6">
-        <FocusRooms />
-      </div>
+      {/* Focus Rooms - shown via the "Start Study Together" button above */}
     </div>
   );
 }
