@@ -125,6 +125,18 @@ export default function TimerMode({
         )}
       </div>
 
+      {/* Float Timer */}
+      {phase !== "idle" && (
+        <div className="flex justify-center">
+          <button
+            onClick={() => window.open('/float-timer.html', 'shukan-float', 'width=220,height=140,menubar=no,toolbar=no,location=no,status=no')}
+            className="text-xs text-muted-foreground font-body hover:text-foreground transition-colors"
+          >
+            🪟 Float Timer
+          </button>
+        </div>
+      )}
+
       {/* Sessions count */}
       <p className="text-center text-sm text-muted-foreground font-body">
         Sessions today: <span className="font-serif font-bold text-foreground">{sessionsCompleted}</span>
