@@ -119,7 +119,7 @@ export default function Profile() {
       <div className="mb-8">
         <h2 className="text-sm font-body text-muted-foreground mb-3 text-center">Study Activity</h2>
         <div className="bg-card rounded-lg border border-border p-4 overflow-hidden">
-          <StreakGrid logs={studyLogs} />
+          <StreakGrid logs={studyLogs} sessions={sessions} />
         </div>
       </div>
     </div>
