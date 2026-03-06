@@ -321,6 +321,10 @@ export type Database = {
         Args: { p_minutes: number; p_user_id: string }
         Returns: undefined
       }
+      is_session_participant: {
+        Args: { _session_id: string; _user_id: string }
+        Returns: boolean
+      }
     }
     Enums: {
       [_ in never]: never
