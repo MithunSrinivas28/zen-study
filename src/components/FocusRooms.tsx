@@ -176,9 +176,35 @@ export default function FocusRooms() {
       )}
 
       {tab === "requests" && (
-        <p className="text-xs text-muted-foreground font-body text-center py-3">
-          Sent requests will appear here
-        </p>
+        <div className="space-y-2">
+          {pendingInvites.length === 0 ? (
+            <p className="text-xs text-muted-foreground font-body text-center py-3">
+              No incoming study requests
+            </p>
+          ) : (
+            pendingInvites.map((inv) => (
+              <div key={inv.id} className="flex items-center justify-between bg-primary/5 rounded-lg px-3 py-2.5 border border-primary/20">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-8 h-8 rounded-full bg-primary/15 flex items-center justify-center">
+                    <span className="text-sm font-serif font-bold text-primary">{inv.creator_username?.[0]?.toUpperCase()}</span>
+                  </div>
+                  <div>
+                    <p className="text-sm font-body text-foreground font-medium">{inv.creator_username}</p>
+                    <p className="text-[10px] text-muted-foreground font-body">50 min focus session</p>
+                  </div>
+                </div>
+                <div className="flex gap-1">
+                  <Button size="sm" className="h-7 px-2 font-body" onClick={() => handleAcceptInvite(inv.id, inv.session_id)}>
+                    <Check size={12} />
+                  </Button>
+                  <Button size="sm" variant="outline" className="h-7 px-2 font-body" onClick={() => declineInvite(inv.id)}>
+                    <X size={12} />
+                  </Button>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
       )}
     </div>
   );
