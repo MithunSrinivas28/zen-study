@@ -131,7 +131,7 @@ export function useFriends() {
     if (!user) return;
     await supabase.from("friend_requests" as any).update({ status: "accepted" } as any).eq("id", requestId);
     // Create bidirectional friendship
-    await supabase.from("friendships" as any).insert({ user_id: fromUserId, friend_id: user.id } as any);
+    await supabase.from("friendships" as any).insert({ user_id: user.id, friend_id: fromUserId } as any);
     await refresh();
   };
 
