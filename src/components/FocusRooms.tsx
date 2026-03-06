@@ -131,17 +131,28 @@ export default function FocusRooms() {
       </div>
 
       {tab === "friends" && (
-        <div className="space-y-1.5">
+        <div className="space-y-2">
           {friends.length === 0 ? (
             <p className="text-xs text-muted-foreground font-body text-center py-3">
               No friends yet. Add someone to study together!
             </p>
           ) : (
             friends.map((friend) => (
-              <div key={friend.id} className="flex items-center justify-between py-2 px-2 rounded-md hover:bg-muted/50">
-                <p className="text-sm font-body text-foreground">{friend.username}</p>
-                <Button size="sm" variant="outline" className="h-7 text-xs font-body" onClick={() => handleInvite(friend.id)}>
-                  Study Together
+              <div key={friend.id} className="flex items-center justify-between bg-muted/30 rounded-lg px-3 py-2.5 border border-border/50">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-8 h-8 rounded-full bg-primary/15 flex items-center justify-center">
+                    <span className="text-sm font-serif font-bold text-primary">{friend.username[0]?.toUpperCase()}</span>
+                  </div>
+                  <div>
+                    <p className="text-sm font-body text-foreground font-medium">{friend.username}</p>
+                    <div className="flex items-center gap-1">
+                      <span className="w-1.5 h-1.5 rounded-full bg-muted-foreground/40" />
+                      <span className="text-[10px] text-muted-foreground font-body">Online</span>
+                    </div>
+                  </div>
+                </div>
+                <Button size="sm" variant="outline" className="h-7 text-xs font-body gap-1" onClick={() => handleInvite(friend.id)}>
+                  <Clock size={10} /> Invite to Study
                 </Button>
               </div>
             ))
